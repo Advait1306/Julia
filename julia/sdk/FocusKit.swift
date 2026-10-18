@@ -334,6 +334,7 @@ final class FocusKit {
     func refreshAccess() {
         stopObserving()
         startObserving()
+
         updates.send(())
     }
 

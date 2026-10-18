@@ -49,11 +49,14 @@ final class Assistant: ObservableObject {
 
     func pressed() {
         guard phase == .idle else { return }
+
         guard (try? JevKeychain().containsKey()) == true else {
             speechDisplay = .message("Add your Jev API key in Julia Settings → AI.")
             return
         }
+
         sst.refreshMicrophonePermission()
+
         guard sst.isReady else {
             if !sst.microphoneEnabled {
                 speechDisplay = .message("Enable the microphone in Julia Settings → Permissions.")
@@ -64,6 +67,7 @@ final class Assistant: ObservableObject {
             }
             return
         }
+
         let id = UUID()
         sessionID = id
         phase = .starting

@@ -37,6 +37,7 @@ final class JuliaDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         overlay = SpeechPanel(assistant: assistant)
+
         if setup.isComplete {
             Task { await assistant.activate() }
         }

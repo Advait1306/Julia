@@ -11,13 +11,11 @@ struct PermissionsView: View {
             } header: {
                 if showsSectionHeaders { Text("Required permissions") }
             }
+
             Section {
                 permissionRows(required: false)
             } header: {
                 if showsSectionHeaders { Text("Additional controls") }
-            }
-            if let error = permissions.errorMessage {
-                Section { Text(error).foregroundStyle(.red) }
             }
         }
         .formStyle(.grouped)
@@ -25,6 +23,7 @@ struct PermissionsView: View {
             // Menu-bar apps don't always become active on return from System Settings.
             while !Task.isCancelled {
                 await permissions.refresh()
+
                 do { try await Task.sleep(for: .seconds(2)) } catch { break }
             }
         }

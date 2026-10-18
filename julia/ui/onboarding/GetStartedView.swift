@@ -7,12 +7,15 @@ struct GetStartedView: View {
     var body: some View {
         VStack(spacing: 32) {
             Spacer()
+
             Image(systemName: "command")
                 .font(.system(size: 124))
                 .foregroundStyle(hotkeys.rightCommandDown ? Color.green : Color.secondary)
                 .accessibilityLabel("Right Command key")
                 .accessibilityValue(hotkeys.rightCommandDown ? "Pressed" : "Not pressed")
+
             Spacer()
+
             Text("Press the right Command key to activate your assistant")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)

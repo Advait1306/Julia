@@ -20,6 +20,7 @@ struct SpeechModelSection: View {
                 Text("Speech model")
                 Text(status)
             }
+
             if case .downloading(let fraction) = sst.modelState {
                 ProgressView(value: fraction)
             }
@@ -31,12 +32,12 @@ struct SpeechModelSection: View {
 
     private var status: String {
         switch sst.modelState {
-        case .checking: "Checking for an existing model…"
-        case .notDownloaded: "Download the model to turn speech into text on your Mac."
-        case .downloading(let fraction): "Downloading… \(Int(fraction * 100))%"
-        case .preparing: "Preparing the model for this Mac…"
-        case .ready: "Downloaded and ready on this Mac."
-        case .failed: "Couldn’t prepare the model. Check your connection and available storage, then retry."
+            case .checking: "Checking for an existing model…"
+            case .notDownloaded: "Download the model to turn speech into text on your Mac."
+            case .downloading(let fraction): "Downloading… \(Int(fraction * 100))%"
+            case .preparing: "Preparing the model for this Mac…"
+            case .ready: "Downloaded and ready on this Mac."
+            case .failed: "Couldn’t prepare the model. Check your connection and available storage, then retry."
         }
     }
 }
