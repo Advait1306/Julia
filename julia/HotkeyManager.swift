@@ -57,8 +57,10 @@ final class HotkeyManager: ObservableObject {
                 guard let self else { return }
                 // A menu-bar app may never become active after a permission change.
                 if Date() >= self.nextAccessCheck { self.refreshAccess() }
+
                 guard self.globalAccess, self.rightCommandDown,
                       CGEventSource.flagsState(.combinedSessionState).rawValue & Self.rightCommandMask == 0 else { return }
+
                 // Command is a modifier: keyState can report false while it is held.
                 // Check the same device-specific flag used by flagsChanged events.
                 // A lost release is cancellation, never an implicit command.

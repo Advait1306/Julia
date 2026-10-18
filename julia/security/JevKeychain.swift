@@ -23,13 +23,17 @@ nonisolated struct JevKeychain: Sendable {
         var request = query
         request[kSecReturnData as String] = true
         request[kSecMatchLimit as String] = kSecMatchLimitOne
+
         var result: CFTypeRef?
         let status = SecItemCopyMatching(request as CFDictionary, &result)
+
         if status == errSecItemNotFound { return nil }
         try check(status)
+
         guard let data = result as? Data, let key = String(data: data, encoding: .utf8) else {
             throw Failure.invalidData
         }
+
         return key
     }
 
@@ -37,23 +41,30 @@ nonisolated struct JevKeychain: Sendable {
     func containsKey() throws -> Bool {
         var request = query
         request[kSecReturnAttributes as String] = true
+
         let context = LAContext()
         context.interactionNotAllowed = true
         request[kSecUseAuthenticationContext as String] = context
+
         let status = SecItemCopyMatching(request as CFDictionary, nil)
+
         if status == errSecItemNotFound { return false }
         try check(status)
+
         return true
     }
 
     func save(_ value: String) throws {
         let key = value.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !key.isEmpty, !key.contains(where: \.isWhitespace) else { throw Failure.invalidKey }
+
         let attributes: [String: Any] = [kSecValueData as String: Data(key.utf8)]
         let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+
         if status == errSecItemNotFound {
             var item = query.merging(attributes) { _, new in new }
             item[kSecAttrLabel as String] = "Julia · Jev API key"
+
             // SecItemAdd's default ACL trusts only the creating application.
             try check(SecItemAdd(item as CFDictionary, nil))
         } else {
@@ -75,10 +86,10 @@ nonisolated struct JevKeychain: Sendable {
 
         var errorDescription: String? {
             switch self {
-            case .invalidKey: "Enter an API key without spaces or line breaks."
-            case .invalidData: "The stored key could not be read. Enter it again in Settings → AI."
-            case .keychain(let status):
-                "Keychain could not complete the operation (\(status)). Unlock your login keychain and try again."
+                case .invalidKey: "Enter an API key without spaces or line breaks."
+                case .invalidData: "The stored key could not be read. Enter it again in Settings → AI."
+                case .keychain(let status):
+                    "Keychain could not complete the operation (\(status)). Unlock your login keychain and try again."
             }
         }
     }

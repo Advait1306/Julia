@@ -1,14 +1,14 @@
-import AppKit
 import Combine
 import Foundation
 
 @MainActor
 final class AppSetup: ObservableObject {
     @Published private(set) var hasAPIKey = false
-    @Published private(set) var keychainError: String?
     @Published private(set) var isComplete: Bool
+
     let assistant: Assistant
     let permissions: AppPermissions
+
     private let keychain = JevKeychain()
 
     init() {
@@ -16,16 +16,16 @@ final class AppSetup: ObservableObject {
         self.assistant = assistant
         permissions = AppPermissions(assistant: assistant)
         isComplete = UserDefaults.standard.bool(forKey: "onboarding.completed")
+
         refreshKeyStatus()
     }
 
     func refreshKeyStatus() {
         do {
             hasAPIKey = try keychain.containsKey()
-            keychainError = nil
         } catch {
             hasAPIKey = false
-            keychainError = error.localizedDescription
+            print("Keychain: \(error.localizedDescription)")
         }
     }
 
@@ -35,18 +35,27 @@ final class AppSetup: ObservableObject {
 
     func saveAPIKey(_ key: String) throws {
         try keychain.save(key)
+
         refreshKeyStatus()
     }
 
     func removeAPIKey() throws {
         try keychain.delete()
+
         refreshKeyStatus()
     }
 
-    func complete() {
-        guard permissions.voiceReady, hasAPIKey, assistant.sst.modelState == .ready else { return }
+    func complete() async -> Bool {
+        await permissions.refresh()
+        refreshKeyStatus()
+
+        guard permissions.voiceReady, hasAPIKey, assistant.sst.modelState == .ready else { return false }
+
         UserDefaults.standard.set(true, forKey: "onboarding.completed")
         isComplete = true
+
         Task { await assistant.activate() }
+
+        return true
     }
 }
