@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Personal Xcode state
+xcuserdata/
+*.xcuserstate
+
+# Local credentials
+.env
+.env.*
+!.env.example
+*.local.xcconfig
